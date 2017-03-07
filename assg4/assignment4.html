@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Thong Bui Heart rate</title>
+		<script type="text/javascript" src="d3.v3.js"></script>
+        <style type="text/css">
+                        /* No style rules here yet */
+        </style>
+   	</head>
+<body>
+  <p>2-week sample of Thong's heart rates before and after workout
+  		 <button>Click to see different sample</button>
+  </p> 
+ 
+  <script type="text/javascript">
+    var dataset;
+    // This exercise shows
+	var fileNames = ["heartrate_1.csv", "heartrate_2.csv", "heartrate_3.csv"];
+	var index = 0;
+	console.log(fileNames[index]);
+    d3.csv(fileNames[index], function(data) {
+        dataset = data;
+//        console.log(data)
+//        console.log(data.length)
+//       generateVis();
+
+	    //Width and height
+	    var w = 600;
+	    var h = 250;
+	    //Create scale functions
+	    var xScale = d3.scale.ordinal()
+	                         .domain(d3.range(dataset.length))
+	                         .rangeRoundBands([0, w], 0.05);
+	    var yScale = d3.scale.linear()
+	                         .domain([0, d3.max(dataset, function(d) { return d.rate; })])
+	                         .range([0, h]);
+	 
+	    //Create SVG element
+	    var svg = d3.select("body")
+	                .append("svg")
+	                .attr("width", w)
+	                .attr("height", h);
+	    //Create bars
+	    svg.selectAll("rect")
+	                           .data(dataset)
+	                           .enter()
+	                           .append("rect")
+	                           .attr("x", function(d, i) {
+//	                           		console.log("xScale(2*i)=" + xScale(i));
+	                                        return xScale(i);
+	                           })
+	                           .attr("y", function(d) {
+	                           		console.log(h - yScale(parseInt(d.rate)));
+	                                        return h - yScale(parseInt(d.rate));
+	                           })
+	                           .attr("width", xScale.rangeBand())
+	                           .attr("height", function(d) {
+	                                        return yScale(parseInt(d.rate));
+	                           })
+	                           .attr("fill", function(d) {
+	                                        return "rgb(0, 0, " + ((parseInt(d.rate)-60)*10) + ")";
+	                           })
+	                           ;
+	
+	    //Create labels
+	   svg.selectAll("text")
+	                           .data(dataset)
+	                           .enter()
+	                           .append("text")
+	                           .text(function(d) {
+	                                        return d.rate;
+	                           })
+	                           .attr("text-anchor", "middle")
+	                           .attr("x", function(d, i) {
+	                                        return xScale(i) + xScale.rangeBand() / 2;
+	                           })
+	                           .attr("y", function(d) {
+	                                        return h - yScale(parseInt(d.rate)) + 14;
+	                           })
+	                           .attr("font-family", "sans-serif")
+	                           .attr("font-size", "11px")
+	                           .attr("fill", "white")
+	                           ;
+	                           
+		//On click, update with new data			
+		d3.select("button").on("click", function() {
+					index = ((index + 1) % fileNames.length);	
+					d3.csv(fileNames[index], function(data) {
+        				dataset = data;
+       				});
+
+					//Update all rects
+					svg.selectAll("rect")
+					   .data(dataset)
+					   .transition()
+//					   .duration(2000)
+					   .delay(function(d, i) {
+						   return i * 50;		// 50 msec additional delay for each subsequent element 
+					   })
+					   .duration(200)
+//					   .ease("linear")
+					   .attr("y", function(d) {
+					   		return h - yScale(parseInt(d.rate));
+					   })
+					   .attr("height", function(d) {
+					   		return yScale(parseInt(d.rate));
+					   })
+					   .attr("fill", function(d) {
+							return "rgb(0, 0, " + ((parseInt(d.rate)-60)*10) + ")";
+					   });
+
+					//Update all labels
+					svg.selectAll("text")
+					   .data(dataset)
+					   .transition()
+//					   .duration(1000)
+//					   .ease("linear")
+					   .delay(function(d, i) {
+						   return i * 50;		//additional  delay for each subsequent element 
+					   })
+					   .duration(200)
+
+					   .text(function(d) {
+					   		return d.rate;
+					   })
+					   .attr("x", function(d, i) {
+					   		return xScale(i) + xScale.rangeBand() / 2;
+					   })
+					   .attr("y", function(d) {
+					   		return h - yScale(parseInt(d.rate)) + 14;
+					   });
+					   			
+
+			});
+    });
+
+
+
+  </script>
+</body>
+</html>
