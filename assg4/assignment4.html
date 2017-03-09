@@ -88,49 +88,50 @@
 					index = ((index + 1) % fileNames.length);	
 					d3.csv(fileNames[index], function(data) {
         				dataset = data;
+	        			//Update all rects
+						svg.selectAll("rect")
+						   .data(dataset)
+						   .transition()
+	//					   .duration(2000)
+						   .delay(function(d, i) {
+							   return i * 50;		// 50 msec additional delay for each subsequent element 
+						   })
+						   .duration(200)
+	//					   .ease("linear")
+						   .attr("y", function(d) {
+						   		return h - yScale(parseInt(d.rate));
+						   })
+						   .attr("height", function(d) {
+						   		return yScale(parseInt(d.rate));
+						   })
+						   .attr("fill", function(d) {
+								return "rgb(0, 0, " + ((parseInt(d.rate)-60)*10) + ")";
+						   });
+	
+						//Update all labels
+						svg.selectAll("text")
+						   .data(dataset)
+						   .transition()
+	//					   .duration(1000)
+	//					   .ease("linear")
+						   .delay(function(d, i) {
+							   return i * 50;		//additional  delay for each subsequent element 
+						   })
+						   .duration(200)
+	
+						   .text(function(d) {
+						   		return d.rate;
+						   })
+						   .attr("x", function(d, i) {
+						   		return xScale(i) + xScale.rangeBand() / 2;
+						   })
+						   .attr("y", function(d) {
+						   		return h - yScale(parseInt(d.rate)) + 14;
+						   });
+					   			
+
        				});
 
-					//Update all rects
-					svg.selectAll("rect")
-					   .data(dataset)
-					   .transition()
-//					   .duration(2000)
-					   .delay(function(d, i) {
-						   return i * 50;		// 50 msec additional delay for each subsequent element 
-					   })
-					   .duration(200)
-//					   .ease("linear")
-					   .attr("y", function(d) {
-					   		return h - yScale(parseInt(d.rate));
-					   })
-					   .attr("height", function(d) {
-					   		return yScale(parseInt(d.rate));
-					   })
-					   .attr("fill", function(d) {
-							return "rgb(0, 0, " + ((parseInt(d.rate)-60)*10) + ")";
-					   });
-
-					//Update all labels
-					svg.selectAll("text")
-					   .data(dataset)
-					   .transition()
-//					   .duration(1000)
-//					   .ease("linear")
-					   .delay(function(d, i) {
-						   return i * 50;		//additional  delay for each subsequent element 
-					   })
-					   .duration(200)
-
-					   .text(function(d) {
-					   		return d.rate;
-					   })
-					   .attr("x", function(d, i) {
-					   		return xScale(i) + xScale.rangeBand() / 2;
-					   })
-					   .attr("y", function(d) {
-					   		return h - yScale(parseInt(d.rate)) + 14;
-					   });
-					   			
 
 			});
     });
